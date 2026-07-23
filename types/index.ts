@@ -4,7 +4,13 @@ export type FlowerType =
   | "yasemin"
   | "yasemin-mavi"
   | "yasemin-kirmizi"
-  | "orkide";
+  | "orkide"
+  | "menekse"
+  | "lilyum"
+  | "zambak"
+  | "sakayik"
+  | "beyaz-gul"
+  | "husnuyusuf";
 
 export interface FlowerMeta {
   type: FlowerType;
