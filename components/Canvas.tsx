@@ -15,7 +15,7 @@ interface CanvasProps {
 
 const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
   { items, onSlotChange, onNoteChange, onDeleteItem, dragStatus, hoveredSlot },
-  ref
+  ref,
 ) {
   const itemBySlot = new Map(items.map((item) => [item.slotIndex, item]));
   const occupiedSlots = itemBySlot.size;
@@ -44,7 +44,8 @@ const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
 
         {Array.from({ length: MAX_SLOTS }).map((_, slotIndex) => {
           const item = itemBySlot.get(slotIndex);
-          const isHovered = dragStatus === "inside" && hoveredSlot === slotIndex;
+          const isHovered =
+            dragStatus === "inside" && hoveredSlot === slotIndex;
           // Boş slot: yeşil (buraya bırakabilirsin).
           // Dolu slot: kehribar (buradaki çiçekle yer değiştirir).
           const isAvailable = isHovered && !item;
@@ -54,7 +55,9 @@ const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
             <div
               key={slotIndex}
               className={`relative flex-1 ${
-                slotIndex < MAX_SLOTS - 1 ? "border-b border-dashed border-ink/10" : ""
+                slotIndex < MAX_SLOTS - 1
+                  ? "border-b border-dashed border-ink/10"
+                  : ""
               }`}
             >
               <div

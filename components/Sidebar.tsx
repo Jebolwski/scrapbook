@@ -11,8 +11,9 @@ interface SidebarProps {
   onAddFlower: (type: FlowerType, clientX: number, clientY: number) => void;
   onDragStatusChange: (
     status: "inside" | "outside" | null,
-    point: { x: number; y: number } | null
+    point: { x: number; y: number } | null,
   ) => void;
+  onDragActiveChange: (active: boolean) => void;
   onClearFlowers: () => void;
   onClearNotes: () => void;
   hasItems: boolean;
@@ -30,6 +31,7 @@ export default function Sidebar({
   canvasRef,
   onAddFlower,
   onDragStatusChange,
+  onDragActiveChange,
   onClearFlowers,
   onClearNotes,
   hasItems,
@@ -48,6 +50,11 @@ export default function Sidebar({
 
   useEffect(() => {
     setMounted(true);
+    // Büyük ekranda çiçek seçenekleri baştan açık gelsin (konsepti anlatmak
+    // için "Çiçek Üret" butonuna basmaya gerek kalmasın). Telefonda ise
+    // çekmece zaten kullanıcı isteğiyle açıldığı için kapalı başlar.
+    const mq = window.matchMedia("(min-width: 768px)");
+    setPanelOpen(mq.matches);
   }, []);
 
   useEffect(() => {
@@ -60,7 +67,12 @@ export default function Sidebar({
       const el = placeholderRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      setFixedRect({ left: r.left, top: r.top, width: r.width, height: r.height });
+      setFixedRect({
+        left: r.left,
+        top: r.top,
+        width: r.width,
+        height: r.height,
+      });
     }
 
     measure();
@@ -85,18 +97,34 @@ export default function Sidebar({
     const canvasEl = canvasRef.current;
     if (!canvasEl) return false;
     const rect = canvasEl.getBoundingClientRect();
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    return (
+      x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+    );
+  }
+
+  function handleDragStart() {
+    onDragActiveChange(true);
   }
 
   // Sürükleme sırasında her hareket: imleç kağıdın üzerinde mi değil mi,
   // bunu üst bileşene bildirerek kırmızı/yeşil geri bildirimi tetikler.
-  function handleDrag(_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) {
+  function handleDrag(
+    _e: PointerEvent | MouseEvent | TouchEvent,
+    info: PanInfo,
+  ) {
     const inside = isPointInsideCanvas(info.point.x, info.point.y);
-    onDragStatusChange(inside ? "inside" : "outside", { x: info.point.x, y: info.point.y });
+    onDragStatusChange(inside ? "inside" : "outside", {
+      x: info.point.x,
+      y: info.point.y,
+    });
   }
 
-  function handleDragEnd(_e: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) {
+  function handleDragEnd(
+    _e: PointerEvent | MouseEvent | TouchEvent,
+    info: PanInfo,
+  ) {
     onDragStatusChange(null, null);
+    onDragActiveChange(false);
 
     const canvasEl = canvasRef.current;
     if (!canvasEl || !selectedFlower) return;
@@ -158,8 +186,13 @@ export default function Sidebar({
                         : "border-black/5 bg-paper/60 hover:bg-paper"
                     }`}
                   >
-                    <FlowerIllustration type={flower.type} className="h-10 w-10" />
-                    <span className="font-ui text-xs text-ink">{flower.label}</span>
+                    <FlowerIllustration
+                      type={flower.type}
+                      className="h-10 w-10"
+                    />
+                    <span className="text-center font-ui text-[11px] leading-tight text-ink">
+                      {flower.label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -251,6 +284,7 @@ export default function Sidebar({
             dragSnapToOrigin
             dragElastic={0.15}
             dragMomentum={false}
+            onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
             whileDrag={{ scale: 1.08, cursor: "grabbing" }}
@@ -271,7 +305,7 @@ export default function Sidebar({
               className="h-28 w-28 drop-shadow-sm"
             />
           </motion.div>,
-          document.body
+          document.body,
         )}
     </aside>
   );
