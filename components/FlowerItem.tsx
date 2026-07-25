@@ -58,7 +58,7 @@ export default function FlowerItem({
         onClick={() => onDelete(item.id)}
         onPointerDown={(e) => e.stopPropagation()}
         aria-label="Çiçeği sil"
-        className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-paper/80 font-ui text-sm leading-none text-inkSoft shadow-soft transition-colors hover:bg-paper hover:text-ink sm:right-2 sm:top-2"
+        className="absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-paper/80 font-ui text-sm leading-none text-inkSoft shadow-soft transition-colors hover:bg-paper hover:text-ink sm:right-2 sm:top-2"
       >
         ×
       </button>

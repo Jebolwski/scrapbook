@@ -11,20 +11,29 @@ interface CanvasProps {
   onDeleteItem: (id: string) => void;
   dragStatus: "inside" | "outside" | null;
   hoveredSlot: number | null;
+  showTip: boolean;
+  onDismissTip: () => void;
 }
 
 const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
-  { items, onSlotChange, onNoteChange, onDeleteItem, dragStatus, hoveredSlot },
+  {
+    items,
+    onSlotChange,
+    onNoteChange,
+    onDeleteItem,
+    dragStatus,
+    hoveredSlot,
+    showTip,
+    onDismissTip,
+  },
   ref,
 ) {
   const itemBySlot = new Map(items.map((item) => [item.slotIndex, item]));
   const occupiedSlots = itemBySlot.size;
 
   return (
-    <main className="desk-texture relative flex h-full w-full flex-1 items-center justify-center overflow-auto p-6 md:p-14">
-      {/* Kağıdın dışına, sürükleme sırasında geri bildirim için kırmızı ton.
-          Kağıt bu katmanın üzerinde (sonraki DOM sırasında) render edildiği
-          için kağıt alanını kapatmaz, sadece etrafındaki masayı boyar. */}
+    <main className="desk-texture relative flex h-full w-full flex-1 items-center justify-center overflow-hidden p-6 md:p-14">
+      {/* Kağıdın dışına, sürükleme sırasında geri bildirim için kırmızı ton */}
       <div
         className={`pointer-events-none absolute inset-0 transition-opacity duration-150 ${
           dragStatus === "outside" ? "opacity-100" : "opacity-0"
@@ -46,8 +55,6 @@ const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
           const item = itemBySlot.get(slotIndex);
           const isHovered =
             dragStatus === "inside" && hoveredSlot === slotIndex;
-          // Boş slot: yeşil (buraya bırakabilirsin).
-          // Dolu slot: kehribar (buradaki çiçekle yer değiştirir).
           const isAvailable = isHovered && !item;
           const isSwap = isHovered && !!item;
 
@@ -84,6 +91,36 @@ const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
           );
         })}
       </div>
+
+      {/* Sol alt köşede duran ipucu sticker'ı */}
+      {showTip && (
+        <div className="pointer-events-none absolute bottom-6 left-6 z-30 hidden md:block">
+          <div className="pointer-events-auto relative max-w-[220px] -rotate-3 rounded-sm bg-paper px-4 py-3 shadow-paper">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-0 h-4 w-11 -translate-x-1/2 -translate-y-1/2 -rotate-2 rounded-[1px]"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(236,226,199,0.92), rgba(212,195,157,0.8))",
+                boxShadow: "0 1px 2px rgba(70,58,49,0.22)",
+                border: "1px solid rgba(70,58,49,0.08)",
+              }}
+            />
+            <button
+              type="button"
+              onClick={onDismissTip}
+              aria-label="İpucunu kapat"
+              className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-paper text-inkSoft shadow-soft transition-colors hover:text-ink"
+            >
+              ×
+            </button>
+            <p className="font-hand text-base leading-snug text-ink">
+              Sol taraftan dilediğin çiçeği seçip panoya sürükleyebilir, üzerine
+              kendi notlarını ekleyebilirsin ✨
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   );
 });

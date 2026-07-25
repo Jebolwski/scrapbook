@@ -14,6 +14,7 @@ interface SidebarProps {
     point: { x: number; y: number } | null,
   ) => void;
   onDragActiveChange: (active: boolean) => void;
+  onFlowerPlaced: () => void;
   onClearFlowers: () => void;
   onClearNotes: () => void;
   hasItems: boolean;
@@ -32,6 +33,7 @@ export default function Sidebar({
   onAddFlower,
   onDragStatusChange,
   onDragActiveChange,
+  onFlowerPlaced,
   onClearFlowers,
   onClearNotes,
   hasItems,
@@ -47,14 +49,17 @@ export default function Sidebar({
   // sınırlama olmadan sağdaki kağıda kadar sürüklenebilir.
   const placeholderRef = useRef<HTMLDivElement>(null);
   const [fixedRect, setFixedRect] = useState<Rect | null>(null);
+  // Önizleme/Kurut kartına referans: seçim yapılınca telefonda otomatik
+  // olarak görünüme kaydırmak için kullanılır (çekmece içinde kalıp
+  // görünmeyebiliyordu).
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
-    // Büyük ekranda çiçek seçenekleri baştan açık gelsin (konsepti anlatmak
-    // için "Çiçek Üret" butonuna basmaya gerek kalmasın). Telefonda ise
-    // çekmece zaten kullanıcı isteğiyle açıldığı için kapalı başlar.
-    const mq = window.matchMedia("(min-width: 768px)");
-    setPanelOpen(mq.matches);
+    // Çiçek seçenekleri baştan açık gelsin (konsepti anlatmak için "Çiçek
+    // Üret" butonuna basmaya gerek kalmasın) — hem masaüstünde hem telefonda
+    // (mobil çekmece açıldığında da doğrudan seçenekleri görsün).
+    setPanelOpen(true);
   }, []);
 
   useEffect(() => {
@@ -77,8 +82,27 @@ export default function Sidebar({
 
     measure();
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    // "scroll" olayı bubble etmez; capture fazında document'a bağlanmak,
+    // sidebar'ın kendi overflow-y-auto scroll'unu da yakalamamızı sağlar.
+    document.addEventListener("scroll", measure, true);
+    return () => {
+      window.removeEventListener("resize", measure);
+      document.removeEventListener("scroll", measure, true);
+    };
   }, [isDried, selectedFlower]);
+
+  useEffect(() => {
+    if (!selectedFlower) return;
+    // Kart animasyonla açılırken kaydırmayı bir tık geciktiriyoruz ki
+    // scrollIntoView doğru (son) yüksekliğe göre hesaplansın.
+    const timer = setTimeout(() => {
+      previewRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [selectedFlower]);
 
   function handleGenerateClick() {
     setPanelOpen((prev) => !prev);
@@ -124,10 +148,12 @@ export default function Sidebar({
     info: PanInfo,
   ) {
     onDragStatusChange(null, null);
-    onDragActiveChange(false);
 
     const canvasEl = canvasRef.current;
-    if (!canvasEl || !selectedFlower) return;
+    if (!canvasEl || !selectedFlower) {
+      onDragActiveChange(false);
+      return;
+    }
 
     const { x, y } = info.point;
     const droppedInsideCanvas = isPointInsideCanvas(x, y);
@@ -137,8 +163,13 @@ export default function Sidebar({
       // Panoya eklendi: paneli sıfırla, kullanıcı yeni bir çiçek üretebilir.
       setSelectedFlower(null);
       setIsDried(false);
+      // Mobilde çekmece kapalı kalsın; tekrar açmak isterse butona basar.
+      onFlowerPlaced();
+    } else {
+      // Kağıdın dışına bırakıldı: dragSnapToOrigin önizlemeyi geri döndürür,
+      // mobil çekmece de eski haline (açık) yükselsin.
+      onDragActiveChange(false);
     }
-    // Kağıdın dışına bırakılırsa dragSnapToOrigin önizlemeyi yerine geri döndürür.
   }
 
   return (
@@ -206,6 +237,7 @@ export default function Sidebar({
         {selectedFlower && (
           <motion.div
             key={selectedFlower}
+            ref={previewRef}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}

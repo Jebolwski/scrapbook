@@ -3,9 +3,17 @@ import { FlowerMeta, FlowerType } from "@/types";
 export const FLOWERS: FlowerMeta[] = [
   {
     type: "yasemin",
-    label: "Beyaz Yasemin",
+    label: "Yasemin",
     freshColor: "#FBFBF0",
     driedColor: "#D8CBA0",
+  },
+  { type: "gul", label: "Gül", freshColor: "#E88C9A", driedColor: "#C08A6E" },
+  { type: "lale", label: "Lale", freshColor: "#E14F63", driedColor: "#B56A55" },
+  {
+    type: "orkide",
+    label: "Orkide",
+    freshColor: "#B57EDC",
+    driedColor: "#A9877E",
   },
   {
     type: "yasemin-mavi",
@@ -18,19 +26,6 @@ export const FLOWERS: FlowerMeta[] = [
     label: "Kırmızı Yasemin",
     freshColor: "#E68A96",
     driedColor: "#BE8B7C",
-  },
-  {
-    type: "gul",
-    label: "Kırmızı Gül",
-    freshColor: "#E88C9A",
-    driedColor: "#C08A6E",
-  },
-  { type: "lale", label: "Lale", freshColor: "#E14F63", driedColor: "#B56A55" },
-  {
-    type: "orkide",
-    label: "Orkide",
-    freshColor: "#B57EDC",
-    driedColor: "#A9877E",
   },
   {
     type: "menekse",

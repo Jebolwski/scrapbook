@@ -51,6 +51,8 @@ export default function Home() {
   const [dragActive, setDragActive] = useState(false);
   // Telefonda sol panel yerine alttan açılan bir çekmece kullanılır.
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+  // Panonun köşesindeki küçük ipucu notu; kullanıcı kapatana kadar durur.
+  const [showTip, setShowTip] = useState(true);
 
   // Kayıtlı sayfaları yükle (yalnızca istemcide).
   useEffect(() => {
@@ -189,6 +191,13 @@ export default function Home() {
     );
   }
 
+  function handleFlowerPlaced() {
+    // Çiçek başarıyla kağıda konduğunda mobil çekmece tekrar açılmasın,
+    // kapalı kalsın; kullanıcı isterse butona basıp yeniden açar.
+    setDragActive(false);
+    setMobilePanelOpen(false);
+  }
+
   function goToPrevPage() {
     setCurrentPage((p) => Math.max(0, p - 1));
   }
@@ -228,6 +237,7 @@ export default function Home() {
           onAddFlower={handleAddFlower}
           onDragStatusChange={handleDragStatusChange}
           onDragActiveChange={setDragActive}
+          onFlowerPlaced={handleFlowerPlaced}
           onClearFlowers={handleClearFlowers}
           onClearNotes={handleClearNotes}
           hasItems={items.length > 0}
@@ -235,7 +245,7 @@ export default function Home() {
         />
       </motion.div>
 
-      {/* Canvas ve Sayfa Kontrollerini kapsayan sağ alan */}
+      {/* Canvas ve sayfa kontrollerini kapsayan sağ alan */}
       <div className="relative h-full min-w-0 flex-1">
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -251,11 +261,13 @@ export default function Home() {
             onDeleteItem={handleDeleteItem}
             dragStatus={dragStatus}
             hoveredSlot={hoveredSlot}
+            showTip={showTip}
+            onDismissTip={() => setShowTip(false)}
           />
         </motion.div>
 
-        {/* Sayfa gezinme: Artık sadece sağ çalışma alanının (Canvas) ortasında durur */}
-        <div className="absolute inset-x-0 z-40 flex pointer-events-none justify-center top-2 md:top-3">
+        {/* Sayfa gezinme: sağ çalışma alanının (Canvas) üst ortasında durur */}
+        <div className="pointer-events-none absolute inset-x-0 top-2 z-40 flex justify-center md:top-3">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -331,6 +343,7 @@ export default function Home() {
                 onAddFlower={handleAddFlower}
                 onDragStatusChange={handleDragStatusChange}
                 onDragActiveChange={setDragActive}
+                onFlowerPlaced={handleFlowerPlaced}
                 onClearFlowers={handleClearFlowers}
                 onClearNotes={handleClearNotes}
                 hasItems={items.length > 0}
