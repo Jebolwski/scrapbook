@@ -24,9 +24,6 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Anı Panosu | Scrapbook",
   description: "Kurutulmuş çiçekler ve notlarla kişisel bir anı defteri.",
-  icons: {
-    icon: "/icon.png", // public içindeki icon.svg'yi çeker
-  },
 };
 
 export default function RootLayout({

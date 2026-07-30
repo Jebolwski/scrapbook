@@ -1,5 +1,6 @@
 export type FlowerType =
   | "gul"
+  | "beyaz-gul"
   | "lale"
   | "yasemin"
   | "yasemin-mavi"
@@ -9,7 +10,6 @@ export type FlowerType =
   | "lilyum"
   | "zambak"
   | "sakayik"
-  | "beyaz-gul"
   | "husnuyusuf";
 
 export interface FlowerMeta {

@@ -21,12 +21,7 @@ export const FLOWERS: FlowerMeta[] = [
     freshColor: "#AFC9EA",
     driedColor: "#A9AF9A",
   },
-  {
-    type: "yasemin-kirmizi",
-    label: "Kırmızı Yasemin",
-    freshColor: "#E68A96",
-    driedColor: "#BE8B7C",
-  },
+
   {
     type: "menekse",
     label: "Menekşe",
@@ -44,6 +39,12 @@ export const FLOWERS: FlowerMeta[] = [
     label: "Zambak",
     freshColor: "#FBFBF3",
     driedColor: "#D9CFAE",
+  },
+  {
+    type: "yasemin-kirmizi",
+    label: "Kırmızı Yasemin",
+    freshColor: "#E68A96",
+    driedColor: "#BE8B7C",
   },
   {
     type: "sakayik",
@@ -108,7 +109,11 @@ export function RoseSvg({
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.92 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.92 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#5C6E4E"
@@ -153,7 +158,11 @@ export function TulipSvg({ dried, className }: FlowerSvgProps) {
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.92 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.92 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#5C6E4E"
@@ -220,7 +229,11 @@ export function JasmineSvg({
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.94 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.94 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#6C7C4E"
@@ -285,7 +298,11 @@ export function OrchidSvg({ dried, className }: FlowerSvgProps) {
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.92 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.92 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#5C6E4E"
@@ -356,7 +373,11 @@ export function VioletSvg({ dried, className }: FlowerSvgProps) {
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.92 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.92 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#5C6E4E"
@@ -428,7 +449,11 @@ export function LilySvg({
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.92 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.92 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#5C6E4E"
@@ -512,7 +537,11 @@ export function PeonySvg({ dried, className }: FlowerSvgProps) {
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.92 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.92 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#5C6E4E"
@@ -575,7 +604,11 @@ export function SweetWilliamSvg({ dried, className }: FlowerSvgProps) {
     <svg
       viewBox="0 0 120 140"
       className={className}
-      style={{ filter: driedFilter(dried), opacity: dried ? 0.92 : 1 }}
+      style={{
+        filter: driedFilter(dried),
+        opacity: dried ? 0.92 : 1,
+        transition: "filter 0.6s ease, opacity 0.6s ease",
+      }}
     >
       <g
         stroke="#5C6E4E"

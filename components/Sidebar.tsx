@@ -4,7 +4,15 @@ import { useEffect, useRef, useState, RefObject } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, PanInfo } from "framer-motion";
 import { FLOWERS, FlowerIllustration } from "@/data/flowers";
+import {
+  exportBoardAsJpeg,
+  exportBoardAsPdf,
+  exportBoardAsPng,
+} from "@/lib/exportBoard";
+import { playDrySound, playPlaceSound } from "@/lib/sound";
 import { FlowerType } from "@/types";
+
+const SOUND_STORAGE_KEY = "ani-panosu-sound";
 
 interface SidebarProps {
   canvasRef: RefObject<HTMLDivElement>;
@@ -43,6 +51,10 @@ export default function Sidebar({
   const [selectedFlower, setSelectedFlower] = useState<FlowerType | null>(null);
   const [isDried, setIsDried] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [exporting, setExporting] = useState<"png" | "jpeg" | "pdf" | null>(
+    null,
+  );
 
   // Kurutulan çiçek bir portal ile document.body'ye taşınır; bu sayede
   // sidebar'ın overflow-y-auto'su onu kesip klip etmez ve her zaman en üstte,
@@ -60,6 +72,13 @@ export default function Sidebar({
     // Üret" butonuna basmaya gerek kalmasın) — hem masaüstünde hem telefonda
     // (mobil çekmece açıldığında da doğrudan seçenekleri görsün).
     setPanelOpen(true);
+
+    try {
+      const stored = window.localStorage.getItem(SOUND_STORAGE_KEY);
+      if (stored !== null) setSoundEnabled(stored === "1");
+    } catch {
+      // localStorage okunamazsa varsayılan (açık) ile devam et
+    }
   }, []);
 
   useEffect(() => {
@@ -104,6 +123,18 @@ export default function Sidebar({
     return () => clearTimeout(timer);
   }, [selectedFlower]);
 
+  function toggleSound() {
+    setSoundEnabled((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(SOUND_STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        // sessizce geç
+      }
+      return next;
+    });
+  }
+
   function handleGenerateClick() {
     setPanelOpen((prev) => !prev);
   }
@@ -115,6 +146,7 @@ export default function Sidebar({
 
   function handleDry() {
     setIsDried(true);
+    playDrySound(soundEnabled);
   }
 
   function isPointInsideCanvas(x: number, y: number) {
@@ -160,6 +192,7 @@ export default function Sidebar({
 
     if (droppedInsideCanvas) {
       onAddFlower(selectedFlower, x, y);
+      playPlaceSound(soundEnabled);
       // Panoya eklendi: paneli sıfırla, kullanıcı yeni bir çiçek üretebilir.
       setSelectedFlower(null);
       setIsDried(false);
@@ -172,13 +205,42 @@ export default function Sidebar({
     }
   }
 
+  async function handleExport(type: "png" | "jpeg" | "pdf") {
+    const node = canvasRef.current;
+    if (!node || exporting) return;
+    setExporting(type);
+    try {
+      if (type === "png") await exportBoardAsPng(node);
+      else if (type === "jpeg") await exportBoardAsJpeg(node);
+      else await exportBoardAsPdf(node);
+    } catch {
+      window.alert(
+        "İndirme sırasında bir sorun oluştu, tekrar deneyebilirsin.",
+      );
+    } finally {
+      setExporting(null);
+    }
+  }
+
   return (
     <aside className="desk-texture flex h-full w-full flex-col gap-6 overflow-y-auto border-r border-black/5 px-7 py-10 md:w-[320px] md:min-w-[320px]">
-      <header className="mb-1">
-        <p className="font-ui text-[11px] uppercase tracking-[0.25em] text-inkSoft">
-          Anı Panosu
-        </p>
-        <h1 className="font-display text-3xl italic text-ink">Çiçek Köşesi</h1>
+      <header className="mb-1 flex items-start justify-between">
+        <div>
+          <p className="font-ui text-[11px] uppercase tracking-[0.25em] text-inkSoft">
+            Anı Panosu
+          </p>
+          <h1 className="font-display text-3xl italic text-ink">
+            Çiçek Köşesi
+          </h1>
+        </div>
+        <button
+          onClick={toggleSound}
+          aria-label={soundEnabled ? "Sesi kapat" : "Sesi aç"}
+          title={soundEnabled ? "Sesi kapat" : "Sesi aç"}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/10 bg-paper/60 text-sm text-ink transition-colors hover:bg-paper"
+        >
+          {soundEnabled ? "🔈" : "🔇"}
+        </button>
       </header>
 
       {/* Çiçek Üret */}
@@ -296,6 +358,35 @@ export default function Sidebar({
         >
           Yazıları Temizle
         </button>
+      </div>
+
+      <div className="flex flex-col gap-2 border-t border-black/5 pt-5">
+        <p className="text-center font-ui text-[11px] uppercase tracking-[0.2em] text-inkSoft">
+          Panoyu İndir
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleExport("png")}
+            disabled={exporting !== null}
+            className="flex-1 rounded-full border border-black/10 bg-transparent px-3 py-2 font-ui text-xs font-semibold text-ink transition-colors hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {exporting === "png" ? "..." : "PNG"}
+          </button>
+          <button
+            onClick={() => handleExport("jpeg")}
+            disabled={exporting !== null}
+            className="flex-1 rounded-full border border-black/10 bg-transparent px-3 py-2 font-ui text-xs font-semibold text-ink transition-colors hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {exporting === "jpeg" ? "..." : "JPEG"}
+          </button>
+          <button
+            onClick={() => handleExport("pdf")}
+            disabled={exporting !== null}
+            className="flex-1 rounded-full border border-black/10 bg-transparent px-3 py-2 font-ui text-xs font-semibold text-ink transition-colors hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {exporting === "pdf" ? "..." : "PDF"}
+          </button>
+        </div>
       </div>
 
       <div className="mt-auto pt-6 text-center">

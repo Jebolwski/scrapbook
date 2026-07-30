@@ -94,8 +94,8 @@ const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
 
       {/* Sol alt köşede duran ipucu sticker'ı */}
       {showTip && (
-        <div className="pointer-events-none absolute bottom-6 left-6 z-30 hidden md:block">
-          <div className="pointer-events-auto relative max-w-[220px] -rotate-3 rounded-sm bg-paper px-4 py-3 shadow-paper">
+        <div className="pointer-events-none absolute bottom-24 left-4 z-30 md:bottom-6 md:left-6">
+          <div className="pointer-events-auto relative max-w-[180px] -rotate-3 rounded-sm bg-paper px-3.5 py-2.5 shadow-paper sm:max-w-[220px] sm:px-4 sm:py-3">
             <span
               aria-hidden
               className="pointer-events-none absolute left-1/2 top-0 h-4 w-11 -translate-x-1/2 -translate-y-1/2 -rotate-2 rounded-[1px]"
@@ -110,11 +110,12 @@ const Canvas = forwardRef<HTMLDivElement, CanvasProps>(function Canvas(
               type="button"
               onClick={onDismissTip}
               aria-label="İpucunu kapat"
+              data-export-hide
               className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-paper text-inkSoft shadow-soft transition-colors hover:text-ink"
             >
               ×
             </button>
-            <p className="font-hand text-base leading-snug text-ink">
+            <p className="font-hand text-sm leading-snug text-ink sm:text-base">
               Sol taraftan dilediğin çiçeği seçip panoya sürükleyebilir, üzerine
               kendi notlarını ekleyebilirsin ✨
             </p>

@@ -299,7 +299,8 @@ export default function Home() {
               aria-label="Yeni sayfa ekle"
               className="whitespace-nowrap font-ui text-xs font-semibold"
             >
-              + Sayfa
+              <span className="sm:hidden">+</span>
+              <span className="hidden sm:inline">+ Sayfa</span>
             </button>
             <span className="mx-0.5 h-4 w-px bg-paper/25" />
             <button
@@ -308,7 +309,8 @@ export default function Home() {
               aria-label="Bu sayfayı sil"
               className="whitespace-nowrap font-ui text-xs font-semibold text-red-200 transition-colors hover:text-red-100 disabled:cursor-not-allowed disabled:text-paper/25"
             >
-              Sayfayı Sil
+              <span className="sm:hidden">🗑</span>
+              <span className="hidden sm:inline">Sayfayı Sil</span>
             </button>
           </motion.div>
         </div>
